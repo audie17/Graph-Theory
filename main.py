@@ -38,7 +38,40 @@ def read_constraint_table(file_name):
                 constraint_table[vertex_number] = {'duration': duration, 'predecessors': predecessors}
     return constraint_table
 
-def compute_ranks(constraints):
+def get_successors(graph):
+    successors = {vertex: [] for vertex in graph}
+
+    for vertex, data in graph.items():
+        predecessors = data['predecessors']
+        for predecessor in predecessors:
+            successors[predecessor].append(vertex)
+
+    return successors
+
+
+'''def has_cycle(graph):
+    removed_vertices = []
+
+    while True:
+        # Find source vertices (vertices with no predecessors)
+        source_vertices = [vertex for vertex, neighbors in graph.items() if not neighbors]
+
+        # If there are no source vertices, exit the loop
+        if not source_vertices:
+            break
+
+        # Remove source vertices and their outgoing edges from the graph
+        for vertex in source_vertices:
+            removed_vertices.append(vertex)
+        
+        # Update the graph to remove the source vertices and their outgoing edges
+        graph = {vertex: predecessor - removed_vertices for vertex, neighbors in graph.items() if vertex not in removed_vertices}
+
+    # If there are still remaining vertices in the graph, it has a cycle
+    return bool(graph)'''
+
+
+'''def compute_ranks(constraints):
     ranks = {}  # Dictionary to store ranks of vertices
     topological_order = []  # List to store the topological order of vertices
 
@@ -50,7 +83,7 @@ def compute_ranks(constraints):
             break
 
     if source_vertex is None:
-        raise ValueError("Graph contains cycles")
+        print("Graph contains cycles")
 
     # Assign rank 0 to the source vertex
     ranks[source_vertex] = 0
@@ -77,17 +110,22 @@ def compute_rank(vertex, constraints, ranks):
     rank = max_predecessor_rank + 1
     return rank
 
-
+'''
 
 
 def main():
     file_name = 'CO1.txt'
-    constraints = read_constraint_table(file_name)
+    graph1 = read_constraint_table(file_name)
+    graph2 =read_constraint_table('CO2.txt')
+    graph3 = read_constraint_table('CO3.txt')
+    graph4 = read_constraint_table ('CO4.txt')
     print("Constraints:")
+    print(get_successors(graph2))
 
-    for vertex_number, data in constraints.items():
+
+    for vertex_number, data in graph3.items():
         print(f"Vertex {vertex_number}: Duration {data['duration']}, Predecessors {data['predecessors']}") 
-    print(compute_ranks(constraints))
+    '''print(compute_ranks(constraints))
 
     ranks = compute_ranks(constraints)
     for vertex, rank in ranks.items():
@@ -95,7 +133,7 @@ def main():
     ranks, topological_order = compute_ranks(constraints)
     for vertex, rank in ranks.items():
         print(f"Vertex {vertex}: Rank {rank}")
-    print("Topological order:", topological_order)
+    print("Topological order:", topological_order)'''
 
 
 
