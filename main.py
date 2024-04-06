@@ -113,6 +113,47 @@ def add_fictitious_tasks(graph):
 
     return new_graph
 
+def return_verteces_rank(graph):
+    '''return_verteces_rank function takes as a parameter a graph and returns a dictionary of rank for each vertex'''
+    rank = {vertex: 0 for vertex in graph}
+    successors = get_successors(graph)
+    visited = {vertex: False for vertex in graph}
+
+    def visit(vertex):
+        if not visited[vertex]:
+            visited[vertex] = True
+            for successor in successors[vertex]:
+                visit(successor)
+            rank[vertex] = max([rank[s] for s in successors[vertex]], default=0) + 1
+
+    for vertex in graph:
+        visit(vertex)
+
+    return rank
+
+def compute_earliest_date_calendar(graph):
+    '''compute_earliest_date_calendar function takes as a parameter a graph and returns a dictionary of earliest date for each vertex'''
+    rank = return_verteces_rank(graph)
+    earliest_date = {vertex: 0 for vertex in graph}
+    successors = get_successors(graph)
+
+    for vertex in graph:
+        earliest_date[vertex] = max([earliest_date[p] + graph[p]['duration'] for p in graph[vertex]['predecessors']], default=0)
+
+    return earliest_date
+
+def compute_latest_date_calendar(graph):
+    '''compute_latest_date_calendar function takes as a parameter a graph and returns a dictionary of latest date for each vertex'''
+    rank = return_verteces_rank(graph)
+    earliest_date_calendar = compute_earliest_date_calendar(graph)
+    latest_date = {vertex: max([earliest_date_calendar[vertex] for vertex in graph]) for vertex in graph}
+    successors = get_successors(graph)
+
+    for vertex in reversed(list(graph)):
+        latest_date[vertex] = min([latest_date[s] - graph[vertex]['duration'] for s in successors[vertex]], default=latest_date[vertex])
+
+    return latest_date
+
 
 def main():
     file_name = 'CO1.txt'
@@ -124,7 +165,10 @@ def main():
     graph6 = read_constraint_table('CO6.txt')
     graph7 = read_constraint_table('CO7.txt')
     print(add_fictitious_tasks(graph7))
-    display_graph_edges(graph7)        
+    display_graph_edges(graph7)
+    print("the ranks of the vertices are: {}".format(return_verteces_rank(graph7)))
+    print("Earliest date calendar: {}".format(compute_earliest_date_calendar(graph7)))
+    print("Latest date calendar: {}".format(compute_latest_date_calendar(graph7)))
     
 if __name__ == "__main__":
     main()
