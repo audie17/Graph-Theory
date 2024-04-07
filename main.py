@@ -6,7 +6,7 @@ from typing import Dict, List
 # Created Date: 2024-03-29
 # ---------------------------------------------------------------------------
 
-""" This  as for objective to do somes operations to automata 
+""" This program will perform this perform on graphs representing constraint tables
     Operations availables are:
 
         -Read a constraint table
@@ -113,6 +113,30 @@ def add_fictitious_tasks(graph):
 
     return new_graph
 
+def is_scheduling_graph(graph):
+    
+        '''is_scheduling_graph function takes as a parameter a graph and returns True if the graph is a scheduling graph, False otherwise'''
+    
+        if has_cycle(graph):
+            return False
+    
+        if has_negative_edges(graph):
+            return False
+    
+        return True
+
+def count_edges(graph):
+    
+        '''count_edges function takes as a parameter a graph and returns the number of edges in the graph'''
+    
+        return sum(len(data['predecessors']) for data in graph.values())
+
+def count_vertices(graph):
+    
+        '''count_vertices function takes as a parameter a graph and returns the number of vertices in the graph'''
+    
+        return len(graph)
+
 def return_verteces_rank(graph):
     '''return_verteces_rank function takes as a parameter a graph and returns a dictionary of rank for each vertex'''
     rank = {vertex: 0 for vertex in graph}
@@ -155,22 +179,41 @@ def compute_latest_date_calendar(graph):
     return latest_date
 
 
-def main():
-    file_name = 'CO1.txt'
-    graph1 = read_constraint_table(file_name)
-    graph2 = read_constraint_table('CO2.txt')
-    graph3 = read_constraint_table('CO3.txt')
-    graph4 = read_constraint_table('CO4.txt')
-    graph5 = read_constraint_table('CO5.txt')
-    graph6 = read_constraint_table('CO6.txt')
-    graph7 = read_constraint_table('CO7.txt')
-    print(add_fictitious_tasks(graph7))
-    display_graph_edges(graph7)
-    print("the ranks of the vertices are: {}".format(return_verteces_rank(graph7)))
-    print("Earliest date calendar: {}".format(compute_earliest_date_calendar(graph7)))
-    print("Latest date calendar: {}".format(compute_latest_date_calendar(graph7)))
+'''def main():
+    "⊹₊┈ㆍ┈ㆍ┈ㆍ✿ㆍ┈ㆍ┈ㆍ┈₊⊹"
+    
     
 if __name__ == "__main__":
+    main()'''
+
+def main():
+    while True:
+        print("\n•───────•°•❀•°•───────  Welcome to the project of the course SM601I - Graph Theory (L3-INT - 2324S6)  ───────•°•❀•°•───────•")
+        print("1. Test a constraint table")
+        print("2. Exit")
+
+        choice = input("\nChoose an operation (1-2): ")
+
+        if choice == '1':
+            file_name = input("Enter the name of the constraint table file: ")
+            graph = read_constraint_table(file_name)
+            display_graph_edges(graph)
+            #display_graph_matrix(graph)
+            print("\nThe number of vertices is: {}".format(count_vertices(graph)))
+            print("The number of edges is: {}".format(count_edges(graph)))
+            if is_scheduling_graph(graph):
+                print("\nThe graph is a scheduling graph.")
+                print("\nThe ranks of the vertices are: {}".format(return_verteces_rank(graph)))
+                print("\nEarliest date calendar: {}".format(compute_earliest_date_calendar(graph)))
+                print("\nLatest date calendar: {}".format(compute_latest_date_calendar(graph)))
+                #print("Floats: {}".format(compute_floats(graph)))
+                #print("Critical paths: {}".format(compute_critical_paths(graph)))
+            else:
+                print("\nThe graph is not a scheduling graph.")
+        elif choice == '2':
+            break
+        else:
+            print("Invalid choice. Please choose a number between 1 and 2.")
+
+if __name__ == "__main__":
     main()
-
-
