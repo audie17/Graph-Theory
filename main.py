@@ -3,7 +3,7 @@ from typing import Dict, List
 # -*- coding: utf-8 -*-
 # ---------------------------------------------------------------------------
 # Created By  : Audrey DAMIBA, Melissa LACHEB, Timéo GOGOLACHVILI , Thomas MASSELLES, Zoé LE MAIGUET
-# Created Date: 2024-03-29
+# Creation Date: 2024-03-29
 # ---------------------------------------------------------------------------
 
 """ This program will perform this perform on graphs representing constraint tables
@@ -51,31 +51,27 @@ def get_successors(graph):
     return successors
 
 def has_cycle(graph):
-
     '''has_cycle function takes as a parameter a graph and returns True if the graph contains a cycle, False otherwise'''
 
-    visited = {vertex: False for vertex in graph}
-    stack = {vertex: False for vertex in graph}
+    while True:
+        # Find source vertices (vertices that are not the successor of any other vertex)
+        successors = {successor for neighbors in graph.values() for successor in neighbors}
+        source_vertices = [vertex for vertex in graph.keys() if vertex not in successors]
 
-    def has_cycle_from_vertex(vertex):
-        if not visited[vertex]:
-            visited[vertex] = True
-            stack[vertex] = True
+        # If there are no source vertices, exit the loop
+        if not source_vertices:
+            break
 
-            for successor in get_successors(graph)[vertex]:
-                if not visited[successor] and has_cycle_from_vertex(successor):
-                    return True
-                elif stack[successor]:
-                    return True
+        print(f"Entry points: {source_vertices}")
+        print("Eliminating entry points")
 
-        stack[vertex] = False
-        return False
+        # Remove source vertices from the graph
+        graph = {vertex: neighbors for vertex, neighbors in graph.items() if vertex not in source_vertices}
 
-    for vertex in graph:
-        if has_cycle_from_vertex(vertex):
-            return True
+        print(f"Remaining vertices: {list(graph.keys()) if graph else 'None'}")
 
-    return False
+    # If there are still remaining vertices in the graph, it has a cycle
+    return bool(graph)
 
 def has_negative_edges(graph):
     
@@ -84,8 +80,10 @@ def has_negative_edges(graph):
         for vertex, data in graph.items():
             for predecessor in data['predecessors']:
                 if graph[predecessor]['duration'] < 0:
+                    print("The graph contains negative edges.")
                     return True
-    
+
+        print("The graph does not contain negative edges.")
         return False
 
 def display_graph_edges(graph):
@@ -135,7 +133,7 @@ def display_graph_matrix(graph):
             matrix[predecessor - 1][vertex - 1] = f"{duration}"
 
     # Display the matrix with headers
-    print("Value Matrix")
+    print("\nValue Matrix")
     print("   ", end="")
     for i in range(1, num_vertices + 1):
         print(f" {i:<2}", end="")
@@ -143,8 +141,12 @@ def display_graph_matrix(graph):
     for i, row in enumerate(matrix, start=1):
         print(f"{i:<2} ", end="")
         for val in row:
-            print(f" {val:<2}", end="")
+            if val == '*':
+                print('\033[31m' + f" {val:<2}" + '\033[0m', end="")
+            else:
+                print(f" {val:<2}", end="")
         print()
+
 
 def is_scheduling_graph(graph):
     
@@ -243,7 +245,7 @@ def compute_critical_paths(graph):
 
     return critical_paths
 
-def main():
+'''def main():
     while True:
         print("\n\033[0;35m•───────•°•❀•°•───────  Welcome to the project of the course SM601I - Graph Theory (L3-INT - 2324S6)  ───────•°•❀•°•───────•")
         print("\n❀ Operations available:")
@@ -272,11 +274,24 @@ def main():
                 print("\n❀ Critical paths: {}".format(compute_critical_paths(graph)))
             else:
                 print("\nThe graph is not a scheduling graph.")
-                
+
         elif choice == '2':
             break
         else:
-            print("Invalid choice. Please choose a number between 1 and 2.")
+            print("Invalid choice. Please choose a number between 1 and 2.")'''
+def main():
+    graph1=read_constraint_table("1.txt")
+    print(has_cycle(graph1))
+    graph_2=read_constraint_table("2.txt")
+    print(has_cycle(graph_2))
+    graph2=read_constraint_table("CO2.txt")
+    display_graph_edges(graph2)
+    display_graph_matrix(graph2)
+    print(has_cycle(graph2))
+    graph3=read_constraint_table("CO3.txt")
+    display_graph_edges(graph3)
+    display_graph_matrix(graph3)
+    print(has_cycle(graph3))
 
 if __name__ == "__main__":
     main()
