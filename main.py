@@ -131,18 +131,19 @@ def display_graph_matrix(graph):
     # Fill in the matrix based on the edges and durations in the graph
     for vertex, data in graph.items():
         for predecessor in data['predecessors']:
-            matrix[predecessor - 1][vertex - 1] = f"{data['duration']}"
+            duration= graph[predecessor]['duration']
+            matrix[predecessor - 1][vertex - 1] = f"{duration}"
 
     # Display the matrix with headers
     print("Value Matrix")
     print("   ", end="")
     for i in range(1, num_vertices + 1):
-        print(f" {i} ", end="")
+        print(f" {i:<2}", end="")
     print()
     for i, row in enumerate(matrix, start=1):
-        print(f"{i}  ", end="")
+        print(f"{i:<2} ", end="")
         for val in row:
-            print(f" {val} ", end="")
+            print(f" {val:<2}", end="")
         print()
 
 def is_scheduling_graph(graph):
@@ -242,40 +243,40 @@ def compute_critical_paths(graph):
 
     return critical_paths
 
-'''def main():
+def main():
     while True:
-        print("\n•───────•°•❀•°•───────  Welcome to the project of the course SM601I - Graph Theory (L3-INT - 2324S6)  ───────•°•❀•°•───────•")
+        print("\n\033[0;35m•───────•°•❀•°•───────  Welcome to the project of the course SM601I - Graph Theory (L3-INT - 2324S6)  ───────•°•❀•°•───────•")
+        print("\n❀ Operations available:")
         print("1. Test a constraint table")
         print("2. Exit")
 
-        choice = input("\n❀ Choose an operation (1-2): ")
+        choice = input("\n\033[0m❀ Choose an operation (1-2): ")
+     
 
         if choice == '1':
             file_name = input("❀ Enter the name of the constraint table file: ")
+            if not file_name or not file_name.endswith('.txt'):
+                print("Please enter a valid file name.")
+                continue
             graph = read_constraint_table(file_name)
             display_graph_edges(graph)
-            #display_graph_matrix(graph)
+            display_graph_matrix(graph)
             print("\n ❀ The number of vertices is: {}".format(count_vertices(graph)))
-            print("❀ The number of edges is: {}".format(count_edges(graph)))
+            print("\n❀ The number of edges is: {}".format(count_edges(graph)))
             if is_scheduling_graph(graph):
                 print("\n❀ The graph is a scheduling graph.")
                 print("\n❀ The ranks of the vertices are: {}".format(return_verteces_rank(graph)))
                 print("\n❀ Earliest date calendar: {}".format(compute_earliest_date_calendar(graph)))
                 print("\n❀ Latest date calendar: {}".format(compute_latest_date_calendar(graph)))
-                #print("❀ Floats: {}".format(compute_floats(graph)))
-                #print("❀ Critical paths: {}".format(compute_critical_paths(graph)))
+                print("\n❀ Floats: {}".format(compute_floats(graph)))
+                print("\n❀ Critical paths: {}".format(compute_critical_paths(graph)))
             else:
                 print("\nThe graph is not a scheduling graph.")
+                
         elif choice == '2':
             break
         else:
-            print("Invalid choice. Please choose a number between 1 and 2.")'''
-
-def main():
-    graph5 = read_constraint_table("CO5.txt")
-    #print(add_fictitious_vertices(graph7))
-    display_graph_edges(graph5)
-    display_graph_matrix(graph5)
+            print("Invalid choice. Please choose a number between 1 and 2.")
 
 if __name__ == "__main__":
     main()
