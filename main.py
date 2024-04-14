@@ -50,29 +50,6 @@ def get_successors(graph):
 
     return successors
 
-def has_cycle(graph):
-    '''has_cycle function takes as a parameter a graph and returns True if the graph contains a cycle, False otherwise'''
-
-    while True:
-        # Find source vertices (vertices that are not the successor of any other vertex)
-        successors = {successor for neighbors in graph.values() for successor in neighbors}
-        source_vertices = [vertex for vertex in graph.keys() if vertex not in successors]
-
-        # If there are no source vertices, exit the loop
-        if not source_vertices:
-            break
-
-        print(f"Entry points: {source_vertices}")
-        print("Eliminating entry points")
-
-        # Remove source vertices from the graph
-        graph = {vertex: neighbors for vertex, neighbors in graph.items() if vertex not in source_vertices}
-
-        print(f"Remaining vertices: {list(graph.keys()) if graph else 'None'}")
-
-    # If there are still remaining vertices in the graph, it has a cycle
-    return bool(graph)
-
 def has_negative_edges(graph):
     
         '''has_negative_edges function takes as a parameter a graph and returns True if the graph contains negative edges, False otherwise'''
@@ -146,6 +123,48 @@ def display_graph_matrix(graph):
             else:
                 print(f" {val:<2}", end="")
         print()
+
+def zero_edges(graph):
+    '''zero_edges function takes as a parameter a graph and returns True if the graph contains zero edges, False otherwise'''
+    for vertex, data in graph.items():
+        if not data['predecessors']:
+            print(f"The edge {vertex} has a weight of 0")
+
+    print("The graph does not contain zero edges.")
+    return False
+
+
+def has_cycle(graph):
+    visited = {vertex: False for vertex in graph}
+    stack = {vertex: False for vertex in graph}
+    successors = get_successors(graph)
+
+    def visit(vertex):
+        if not visited[vertex]:
+            visited[vertex] = True
+            stack[vertex] = True
+            print(f"Entry points: {vertex}")
+            print(f"Eliminating entry points")
+            remaining_vertices = [v for v in graph if not visited[v]]
+            print(f"Remaining vertices: {' '.join(map(str, remaining_vertices))}")
+            for successor in sorted(successors[vertex]):  # visit successors in order
+                if not visited[successor] and visit(successor):
+                    return True
+                elif stack[successor]:
+                    return True
+            stack[vertex] = False
+        return False
+
+    # Get the source nodes
+    sources = sorted(vertex for vertex in graph if not any(vertex in successors[v] for v in graph))
+
+    for source in sources:
+        if visit(source):
+            print("The graph contains a cycle.")
+            return True
+
+    print("The graph does not contain a cycle.")
+    return False
 
 
 def is_scheduling_graph(graph):
@@ -280,18 +299,17 @@ def compute_critical_paths(graph):
         else:
             print("Invalid choice. Please choose a number between 1 and 2.")'''
 def main():
-    graph1=read_constraint_table("1.txt")
-    print(has_cycle(graph1))
-    graph_2=read_constraint_table("2.txt")
-    print(has_cycle(graph_2))
-    graph2=read_constraint_table("CO2.txt")
+    '''graph2=read_constraint_table("CO2.txt")
     display_graph_edges(graph2)
-    display_graph_matrix(graph2)
     print(has_cycle(graph2))
     graph3=read_constraint_table("CO3.txt")
     display_graph_edges(graph3)
-    display_graph_matrix(graph3)
     print(has_cycle(graph3))
-
+    graph7=read_constraint_table("CO7.txt")
+    display_graph_edges(graph7)
+    print(has_cycle(graph7))'''
+    graph10=read_constraint_table("CO10.txt")
+    display_graph_edges(graph10)
+    print(has_cycle(graph10))
 if __name__ == "__main__":
     main()
