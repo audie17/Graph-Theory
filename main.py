@@ -133,38 +133,54 @@ def zero_edges(graph):
     print("The graph does not contain zero edges.")
     return False
 
-
 def has_cycle(graph):
+    '''has_cycle function takes as a parameter a graph and using depth-first search it returns True if the graph contains a cycle, False otherwise'''
     visited = {vertex: False for vertex in graph}
     stack = {vertex: False for vertex in graph}
-    successors = get_successors(graph)
-
-    def visit(vertex):
-        if not visited[vertex]:
-            visited[vertex] = True
-            stack[vertex] = True
-            print(f"Entry points: {vertex}")
-            print(f"Eliminating entry points")
-            remaining_vertices = [v for v in graph if not visited[v]]
-            print(f"Remaining vertices: {' '.join(map(str, remaining_vertices))}")
-            for successor in sorted(successors[vertex]):  # visit successors in order
-                if not visited[successor] and visit(successor):
+    
+    def depth_first_search(vertex):
+        visited[vertex] = True
+        stack[vertex] = True
+        
+        entry_points = [neighbor for neighbor in graph[vertex]['predecessors'] if not visited[neighbor]]
+        if not entry_points:
+            print(f"Entry points for vertex {vertex}")
+        remaining_vertices = [v for v in graph if not visited[v] and v not in entry_points]
+        print(f"Eliminating entry points")
+        print(f"Remaining vertices: {' '.join(map(str, remaining_vertices)) if remaining_vertices else 'None'}")
+        
+        for neighbor in graph[vertex]['predecessors']:
+            if not visited[neighbor]:
+                if depth_first_search(neighbor):
                     return True
-                elif stack[successor]:
-                    return True
-            stack[vertex] = False
+            elif stack[neighbor]:
+                return True
+        
+        stack[vertex] = False
         return False
+    
+    for vertex in graph:
+        if not visited[vertex]:
+            if depth_first_search(vertex):
+                return True
 
-    # Get the source nodes
-    sources = sorted(vertex for vertex in graph if not any(vertex in successors[v] for v in graph))
-
-    for source in sources:
-        if visit(source):
-            print("The graph contains a cycle.")
-            return True
-
-    print("The graph does not contain a cycle.")
     return False
+
+def main():
+    graph2 = read_constraint_table("CO2.txt")
+    display_graph_edges(graph2)
+    print(has_cycle(graph2))
+    graph3 = read_constraint_table("CO3.txt")
+    display_graph_edges(graph3)
+    print(has_cycle(graph3))
+    graph7 = read_constraint_table("CO7.txt")
+    display_graph_edges(graph7)
+    print(has_cycle(graph7))
+    graph10 = read_constraint_table("CO10.txt")
+    display_graph_edges(graph10)
+    print(has_cycle(graph10))
+
+
 
 
 def is_scheduling_graph(graph):
@@ -284,6 +300,8 @@ def compute_critical_paths(graph):
             display_graph_matrix(graph)
             print("\n ❀ The number of vertices is: {}".format(count_vertices(graph)))
             print("\n❀ The number of edges is: {}".format(count_edges(graph)))
+            if zero_edges(graph):
+                print("\n❀ The graph contains zero edges.")
             if is_scheduling_graph(graph):
                 print("\n❀ The graph is a scheduling graph.")
                 print("\n❀ The ranks of the vertices are: {}".format(return_verteces_rank(graph)))
@@ -298,18 +316,6 @@ def compute_critical_paths(graph):
             break
         else:
             print("Invalid choice. Please choose a number between 1 and 2.")'''
-def main():
-    '''graph2=read_constraint_table("CO2.txt")
-    display_graph_edges(graph2)
-    print(has_cycle(graph2))
-    graph3=read_constraint_table("CO3.txt")
-    display_graph_edges(graph3)
-    print(has_cycle(graph3))
-    graph7=read_constraint_table("CO7.txt")
-    display_graph_edges(graph7)
-    print(has_cycle(graph7))'''
-    graph10=read_constraint_table("CO10.txt")
-    display_graph_edges(graph10)
-    print(has_cycle(graph10))
+
 if __name__ == "__main__":
     main()
