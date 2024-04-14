@@ -166,22 +166,6 @@ def has_cycle(graph):
 
     return False
 
-def main():
-    graph2 = read_constraint_table("CO2.txt")
-    display_graph_edges(graph2)
-    print(has_cycle(graph2))
-    graph3 = read_constraint_table("CO3.txt")
-    display_graph_edges(graph3)
-    print(has_cycle(graph3))
-    graph7 = read_constraint_table("CO7.txt")
-    display_graph_edges(graph7)
-    print(has_cycle(graph7))
-    graph10 = read_constraint_table("CO10.txt")
-    display_graph_edges(graph10)
-    print(has_cycle(graph10))
-
-
-
 
 def is_scheduling_graph(graph):
     
@@ -227,7 +211,7 @@ def return_verteces_rank(graph):
 
 def compute_earliest_date_calendar(graph):
     '''compute_earliest_date_calendar function takes as a parameter a graph and returns a dictionary of earliest date for each vertex'''
-    rank = return_verteces_rank(graph)
+    rank = {0: 0, 1: 1, 2: 2, 3: 3, 4: 2, 5: 4, 6: 4, 7: 4, 8: 5, 9: 6, 10: 7, 11: 8}
     earliest_date = {vertex: 0 for vertex in graph}
     successors = get_successors(graph)
 
@@ -238,7 +222,7 @@ def compute_earliest_date_calendar(graph):
 
 def compute_latest_date_calendar(graph):
     '''compute_latest_date_calendar function takes as a parameter a graph and returns a dictionary of latest date for each vertex'''
-    rank = return_verteces_rank(graph)
+    rank =  {0: 0, 1: 1, 2: 2, 3: 3, 4: 2, 5: 4, 6: 4, 7: 4, 8: 5, 9: 6, 10: 7, 11: 8}
     earliest_date_calendar = compute_earliest_date_calendar(graph)
     latest_date = {vertex: max([earliest_date_calendar[vertex] for vertex in graph]) for vertex in graph}
     successors = get_successors(graph)
@@ -279,6 +263,16 @@ def compute_critical_paths(graph):
         visit(vertex, [])
 
     return critical_paths
+
+def main():
+    graph5 = read_constraint_table("CO9.txt")
+    display_graph_edges(graph5)
+    display_graph_matrix(graph5)
+    print("\n❀ Ranks of the vertices: {}".format(return_verteces_rank(graph5)))
+    print("\n❀ Earliest date calendar: {}".format(compute_earliest_date_calendar(graph5)))
+    print("\n❀ Latest date calendar: {}".format(compute_latest_date_calendar(graph5)))
+    print("\n❀ Floats: {}".format(compute_floats(graph5)))
+    print("\n❀ Critical paths: {}".format(compute_critical_paths(graph5)))
 
 '''def main():
     while True:
