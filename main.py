@@ -67,39 +67,38 @@ def display_graph_edges(graph):
 
     '''display_graph_edges function takes as a parameter a graph and displays the edges of the graph'''
 
-    #add_fictitious_vertices(graph)
+    add_fictitious_vertices(graph)
     for node, data in graph.items():
         for predecessor in data['predecessors']:
             duration = graph[predecessor]['duration']
             print(f"{predecessor} -> {node} = {duration}")
 
 def add_fictitious_vertices(graph):
-    #if any vertices has no predecessors, we add a fictitious vertex 0 with a duration of 0
-    #if any vertices has no successors, we add a fictitious vertex n+1 with a duration of 0
-    vertices = list(graph.keys())
-    n = len(vertices)
-
-    # Add fictitious vertex 0 if any vertex has no predecessors
-    for vertex in vertices:
-        if all(vertex not in graph[v]['predecessors'] for v in vertices):
-            if 0 not in graph:
-                graph[0] = {'predecessors': [], 'duration': 0}
-            graph[vertex]['predecessors'].append(0)
-
-    # Add fictitious vertex n+1 if any vertex has no successors
-    for vertex in vertices:
-        if not any(vertex in graph[v]['predecessors'] for v in vertices):
-            if n+1 not in graph:
-                graph[n+1] = {'predecessors': [], 'duration': 0}
-            if 'successors' not in graph[vertex]:
-                graph[vertex]['successors'] = []
-            graph[vertex]['successors'].append(n+1)
-
+    '''add_fictitious_vertices function takes as a parameter a graph and adds two fictitious vertices: one at the beginning and one at the end of the graph'''
+    # Add the fictitious vertex at the beginning of the graph
+    graph[0] = {'predecessors': [], 'duration': 0}
+    
+    # Find all vertices that don't have predecessors and add vertex 0 as their predecessor
+    for vertex, data in graph.items():
+        if not data['predecessors'] and vertex != 0:
+            data['predecessors'].append(0)
+    
+    # Find all vertices that don't have successors and are not the vertex 0
+    vertices_without_successors = [vertex for vertex in graph if vertex != 0 and not any(vertex in graph[v]['predecessors'] for v in graph)]
+    n = len(graph)-1
+    # Add the fictitious vertex at the end of the graph
+    graph[n+1] = {'predecessors': vertices_without_successors, 'duration': 0}
+    
     return graph
 
+
 def display_graph_matrix(graph):
-    num_vertices = len(graph)
+
+    '''display_graph_matrix function takes as a parameter a graph and displays the matrix of the graph'''
+
     
+    add_fictitious_vertices(graph)
+    num_vertices = len(graph)
     # Create an empty matrix with dimensions (num_vertices + 1) x (num_vertices + 1)
     matrix = [['*' for _ in range(num_vertices)] for _ in range(num_vertices)]
     
@@ -134,7 +133,9 @@ def zero_edges(graph):
     return False
 
 def has_cycle(graph):
+
     '''has_cycle function takes as a parameter a graph and using depth-first search it returns True if the graph contains a cycle, False otherwise'''
+
     visited = {vertex: False for vertex in graph}
     stack = {vertex: False for vertex in graph}
     
@@ -165,7 +166,6 @@ def has_cycle(graph):
                 return True
 
     return False
-
 
 def is_scheduling_graph(graph):
     
@@ -264,17 +264,8 @@ def compute_critical_paths(graph):
 
     return critical_paths
 
-def main():
-    graph5 = read_constraint_table("CO9.txt")
-    display_graph_edges(graph5)
-    display_graph_matrix(graph5)
-    print("\n❀ Ranks of the vertices: {}".format(return_verteces_rank(graph5)))
-    print("\n❀ Earliest date calendar: {}".format(compute_earliest_date_calendar(graph5)))
-    print("\n❀ Latest date calendar: {}".format(compute_latest_date_calendar(graph5)))
-    print("\n❀ Floats: {}".format(compute_floats(graph5)))
-    print("\n❀ Critical paths: {}".format(compute_critical_paths(graph5)))
 
-'''def main():
+def main():
     while True:
         print("\n\033[0;35m•───────•°•❀•°•───────  Welcome to the project of the course SM601I - Graph Theory (L3-INT - 2324S6)  ───────•°•❀•°•───────•")
         print("\n❀ Operations available:")
@@ -298,18 +289,20 @@ def main():
                 print("\n❀ The graph contains zero edges.")
             if is_scheduling_graph(graph):
                 print("\n❀ The graph is a scheduling graph.")
-                print("\n❀ The ranks of the vertices are: {}".format(return_verteces_rank(graph)))
-                print("\n❀ Earliest date calendar: {}".format(compute_earliest_date_calendar(graph)))
-                print("\n❀ Latest date calendar: {}".format(compute_latest_date_calendar(graph)))
-                print("\n❀ Floats: {}".format(compute_floats(graph)))
-                print("\n❀ Critical paths: {}".format(compute_critical_paths(graph)))
+                print("\n❀ The ranks of the vertices are: {}".format(return_verteces_rank(graph)))  
+                if not all(vertex['duration'] != 0 for vertex in graph.values()):
+                    print("\n❀ Earliest date calendar: {}".format(compute_earliest_date_calendar(graph)))
+                    print("\n❀ Latest date calendar: {}".format(compute_latest_date_calendar(graph)))
+                    print("\n❀ Floats: {}".format(compute_floats(graph)))
+                    print("\n❀ Critical paths: {}".format(compute_critical_paths(graph)))
             else:
                 print("\nThe graph is not a scheduling graph.")
 
         elif choice == '2':
             break
         else:
-            print("Invalid choice. Please choose a number between 1 and 2.")'''
+            print("Invalid choice. Please choose a number between 1 and 2.")
+
 
 if __name__ == "__main__":
     main()
