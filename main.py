@@ -67,7 +67,6 @@ def display_graph_edges(graph):
 
     '''display_graph_edges function takes as a parameter a graph and displays the edges of the graph'''
 
-    add_fictitious_vertices(graph)
     for node, data in graph.items():
         for predecessor in data['predecessors']:
             duration = graph[predecessor]['duration']
@@ -91,30 +90,31 @@ def add_fictitious_vertices(graph):
     
     return graph
 
+def display_graph(graph):
+    '''display_graph function takes as a parameter a graph and displays the graph'''
+    add_fictitious_vertices(graph)
+    display_graph_edges(graph)
+    display_graph_matrix(graph)
 
 def display_graph_matrix(graph):
-
     '''display_graph_matrix function takes as a parameter a graph and displays the matrix of the graph'''
 
-    
-    add_fictitious_vertices(graph)
     num_vertices = len(graph)
-    # Create an empty matrix with dimensions (num_vertices + 1) x (num_vertices + 1)
+
     matrix = [['*' for _ in range(num_vertices)] for _ in range(num_vertices)]
     
-    # Fill in the matrix based on the edges and durations in the graph
     for vertex, data in graph.items():
         for predecessor in data['predecessors']:
-            duration= graph[predecessor]['duration']
-            matrix[predecessor - 1][vertex - 1] = f"{duration}"
+            duration = graph[predecessor]['duration']
+            matrix[predecessor][vertex] = f"{duration}"
 
-    # Display the matrix with headers
+
     print("\nValue Matrix")
     print("   ", end="")
-    for i in range(1, num_vertices + 1):
+    for i in range(num_vertices):
         print(f" {i:<2}", end="")
     print()
-    for i, row in enumerate(matrix, start=1):
+    for i, row in enumerate(matrix, start=0):
         print(f"{i:<2} ", end="")
         for val in row:
             if val == '*':
@@ -302,7 +302,6 @@ def main():
             break
         else:
             print("Invalid choice. Please choose a number between 1 and 2.")
-
 
 if __name__ == "__main__":
     main()
