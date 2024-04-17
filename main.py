@@ -191,23 +191,32 @@ def count_vertices(graph):
     
         return len(graph)
 
-def return_verteces_rank(graph):
-    '''return_verteces_rank function takes as a parameter a graph and returns a dictionary of rank for each vertex'''
-    rank = {vertex: 0 for vertex in graph}
-    successors = get_successors(graph)
-    visited = {vertex: False for vertex in graph}
+def compute_ranks(graph):
+    # Initialize a dictionary to store the ranks of vertices
+    ranks = {node: 0 for node in graph}
 
-    def visit(vertex):
-        if not visited[vertex]:
-            visited[vertex] = True
-            for successor in successors[vertex]:
-                visit(successor)
-            rank[vertex] = max([rank[s] for s in successors[vertex]], default=0) + 1
+    # Identify a source vertex and assign a rank of 0
+    for node in graph:
+        if not graph[node]['predecessors']:
+            ranks[node] = 0
+            break
 
-    for vertex in graph:
-        visit(vertex)
+    # Compute ranks for each vertex
+    for node in graph:
+        if graph[node]['predecessors']:
+            ranks[node] = max(ranks[predecessor] for predecessor in graph[node]['predecessors']) + 1
 
-    return rank
+    # Perform a topological sort based on the ranks
+    sorted_vertices = sorted(graph.keys(), key=lambda x: ranks[x])
+
+    return ranks, sorted_vertices
+
+def main ():
+    graph = read_constraint_table("14.txt")
+    print("\n❀ The graph is:")
+    display_graph(graph)
+    print("\n The rank of the vertices is: {}".format(compute_ranks(graph)))
+
 
 def compute_earliest_date_calendar(graph):
     '''compute_earliest_date_calendar function takes as a parameter a graph and returns a dictionary of earliest date for each vertex'''
@@ -264,7 +273,7 @@ def compute_critical_paths(graph):
 
     return critical_paths
 
-
+'''
 def main():
     while True:
         print("\n\033[0;35m•───────•°•❀•°•───────  Welcome to the project of the course SM601I - Graph Theory (L3-INT - 2324S6)  ───────•°•❀•°•───────•")
@@ -281,15 +290,15 @@ def main():
                 print("Please enter a valid file name.")
                 continue
             graph = read_constraint_table(file_name)
-            display_graph_edges(graph)
-            display_graph_matrix(graph)
+            print("\n❀ The graph is:")
+            display_graph(graph)
             print("\n ❀ The number of vertices is: {}".format(count_vertices(graph)))
             print("\n❀ The number of edges is: {}".format(count_edges(graph)))
             if zero_edges(graph):
                 print("\n❀ The graph contains zero edges.")
             if is_scheduling_graph(graph):
                 print("\n❀ The graph is a scheduling graph.")
-                print("\n❀ The ranks of the vertices are: {}".format(return_verteces_rank(graph)))  
+                print("\n❀ The ranks of the vertices are: {}".format(compute_rank(graph)))  
                 if not all(vertex['duration'] != 0 for vertex in graph.values()):
                     print("\n❀ Earliest date calendar: {}".format(compute_earliest_date_calendar(graph)))
                     print("\n❀ Latest date calendar: {}".format(compute_latest_date_calendar(graph)))
@@ -302,6 +311,6 @@ def main():
             break
         else:
             print("Invalid choice. Please choose a number between 1 and 2.")
-
+'''
 if __name__ == "__main__":
     main()
