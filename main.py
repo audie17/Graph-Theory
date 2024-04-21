@@ -191,36 +191,52 @@ def count_vertices(graph):
     
         return len(graph)
 
+
 def compute_ranks(graph):
-    # Initialize a dictionary to store the ranks of vertices
-    ranks = {node: 0 for node in graph}
 
-    # Identify a source vertex and assign a rank of 0
-    for node in graph:
-        if not graph[node]['predecessors']:
-            ranks[node] = 0
-            break
+    '''compute_ranks function takes as a parameter a graph and returns a dictionary of ranks for each vertex'''
 
-    # Compute ranks for each vertex
-    for node in graph:
-        if graph[node]['predecessors']:
-            ranks[node] = max(ranks[predecessor] for predecessor in graph[node]['predecessors']) + 1
+    ranks = {vertex: -1 for vertex in graph}
+    predecessors = {vertex: [] for vertex in graph}
+    for vertex, data in graph.items():
+        for predecessor in data['predecessors']:
+            predecessors[vertex].append(predecessor)
 
-    # Perform a topological sort based on the ranks
-    sorted_vertices = sorted(graph.keys(), key=lambda x: ranks[x])
+    def calculate_rank(vertex):
+        if ranks[vertex] != -1:
+            return ranks[vertex]
+        
+        if not predecessors[vertex]:
+            ranks[vertex] = 0
+            return 0
 
-    return ranks, sorted_vertices
+        max_rank = max(calculate_rank(predecessor) for predecessor in predecessors[vertex])
+        
+        ranks[vertex] = max_rank + 1
 
-def main ():
-    graph = read_constraint_table("14.txt")
+        return ranks[vertex]
+
+    for vertex in graph:
+        calculate_rank(vertex)
+
+    return ranks
+
+def main():
+    graph = read_constraint_table("2.txt")
     print("\n❀ The graph is:")
     display_graph(graph)
-    print("\n The rank of the vertices is: {}".format(compute_ranks(graph)))
+    display_graph_edges(graph)
+    if  not has_cycle(graph):
+        print("\n The rank of the vertices is: {}".format(compute_ranks(graph)))
+        print("\n The earliest date calendar is: {}".format(compute_earliest_date_calendar(graph)))
+        print("\n The latest date calendar is: {}".format(compute_latest_date_calendar(graph)))
+        print("\n The floats are: {}".format(compute_floats(graph)))
+        print("\n The critical paths are: {}".format(compute_critical_paths(graph)))
 
 
 def compute_earliest_date_calendar(graph):
     '''compute_earliest_date_calendar function takes as a parameter a graph and returns a dictionary of earliest date for each vertex'''
-    rank = {0: 0, 1: 1, 2: 2, 3: 3, 4: 2, 5: 4, 6: 4, 7: 4, 8: 5, 9: 6, 10: 7, 11: 8}
+    rank = compute_ranks(graph)
     earliest_date = {vertex: 0 for vertex in graph}
     successors = get_successors(graph)
 
@@ -231,7 +247,7 @@ def compute_earliest_date_calendar(graph):
 
 def compute_latest_date_calendar(graph):
     '''compute_latest_date_calendar function takes as a parameter a graph and returns a dictionary of latest date for each vertex'''
-    rank =  {0: 0, 1: 1, 2: 2, 3: 3, 4: 2, 5: 4, 6: 4, 7: 4, 8: 5, 9: 6, 10: 7, 11: 8}
+    rank =compute_ranks(graph)  
     earliest_date_calendar = compute_earliest_date_calendar(graph)
     latest_date = {vertex: max([earliest_date_calendar[vertex] for vertex in graph]) for vertex in graph}
     successors = get_successors(graph)
