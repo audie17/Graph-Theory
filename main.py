@@ -222,39 +222,49 @@ def compute_ranks(graph):
     return ranks
 
 def main():
-    graph = read_constraint_table("2.txt")
+    graph = read_constraint_table("6.txt")
     print("\n❀ The graph is:")
     display_graph(graph)
     display_graph_edges(graph)
     if  not has_cycle(graph):
         print("\n The rank of the vertices is: {}".format(compute_ranks(graph)))
         print("\n The earliest date calendar is: {}".format(compute_earliest_date_calendar(graph)))
+        print(graph)
         print("\n The latest date calendar is: {}".format(compute_latest_date_calendar(graph)))
         print("\n The floats are: {}".format(compute_floats(graph)))
         print("\n The critical paths are: {}".format(compute_critical_paths(graph)))
 
 
 def compute_earliest_date_calendar(graph):
-    '''compute_earliest_date_calendar function takes as a parameter a graph and returns a dictionary of earliest date for each vertex'''
-    rank = compute_ranks(graph)
-    earliest_date = {vertex: 0 for vertex in graph}
-    successors = get_successors(graph)
+    '''compute_earliest_date function takes as a parameter a graph and returns a dictionary of earliest date for each vertex'''
+    earliest_date = {vertex: 0 for vertex in graph}  # Initialize earliest_date dictionary
+    successors = get_successors(graph)  # Get successors for each vertex
 
+    def visit(vertex):
+        for successor in successors[vertex]:
+            earliest_date[successor] = max(earliest_date[successor], earliest_date[vertex] + graph[vertex]['duration'])
+
+    visit(0) 
     for vertex in graph:
-        earliest_date[vertex] = max([earliest_date[p] + graph[p]['duration'] for p in graph[vertex]['predecessors']], default=0)
+        if vertex != 0:  
+            visit(vertex)
 
     return earliest_date
 
+
 def compute_latest_date_calendar(graph):
     '''compute_latest_date_calendar function takes as a parameter a graph and returns a dictionary of latest date for each vertex'''
-    rank =compute_ranks(graph)  
+    rank = compute_ranks(graph)  
     earliest_date_calendar = compute_earliest_date_calendar(graph)
-    latest_date = {vertex: max([earliest_date_calendar[vertex] for vertex in graph]) for vertex in graph}
+    max_earliest_date = max(earliest_date_calendar.values())
+    latest_date = {vertex: max_earliest_date for vertex in graph}
     successors = get_successors(graph)
 
     for vertex in reversed(list(graph)):
-        latest_date[vertex] = min([latest_date[s] - graph[vertex]['duration'] for s in successors[vertex]], default=latest_date[vertex])
-
+        if successors[vertex]:  # If the vertex has successors
+            latest_date[vertex] = min(latest_date[s] for s in successors[vertex]) - graph[vertex]['duration']
+            latest_date[0] = 0
+    
     return latest_date
 
 def compute_floats(graph):  
@@ -285,7 +295,7 @@ def compute_critical_paths(graph):
             path.pop()
 
     for vertex in graph:
-        visit(vertex, [])
+        visit(0, [])
 
     return critical_paths
 
