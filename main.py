@@ -283,22 +283,33 @@ def compute_critical_paths(graph):
     visited = {vertex: False for vertex in graph}
     successors = get_successors(graph)
     ordered_vertices = sorted(graph, key=lambda vertex: ranks[vertex])  # Order the vertices by their ranks
-    ordered_vertices_dico = {vertex: graph[vertex] for vertex in ordered_vertices}
-    print(ordered_vertices_dico)
-    #print(ordered_vertices)
-    def visit(vertex, path):
+    ordered_graph = {vertex: graph[vertex] for vertex in ordered_vertices}
+
+
+    def visit(vertex, path, duration, max_duration, critical_paths):
         if not visited[vertex]:
             visited[vertex] = True
             path.append(vertex)
+            duration += graph[vertex]['duration']
             if not successors[vertex]:
-                critical_paths.append(path.copy())
-            for successor in successors[vertex]:
-                if floats[successor] == 0:
-                    visit(successor, path.copy())
+                if path[0] == 0:
+                    if duration > max_duration[0]:
+                        critical_paths.clear()
+                        critical_paths.append(path.copy())
+                        max_duration[0] = duration
+                    elif duration == max_duration[0]:
+                        critical_paths.append(path.copy())
+            else:
+                for successor in successors[vertex]:
+                    if floats[successor] == 0:
+                        visit(successor, path.copy(), duration, max_duration, critical_paths)
             path.pop()
+            visited[vertex] = False
+        return max_duration, critical_paths
 
-    for vertex in ordered_vertices_dico:  # Visit the vertices in the order of their ranks
-        visit(vertex, [])
+    max_duration = [0]
+    for vertex in ordered_graph:  # Visit the vertices in the order of their ranks
+        max_duration, critical_paths = visit(vertex, [], 0, max_duration, critical_paths)
 
     return critical_paths
 '''
