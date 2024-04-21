@@ -229,7 +229,6 @@ def main():
     if  not has_cycle(graph):
         print("\n The rank of the vertices is: {}".format(compute_ranks(graph)))
         print("\n The earliest date calendar is: {}".format(compute_earliest_date_calendar(graph)))
-        print(graph)
         print("\n The latest date calendar is: {}".format(compute_latest_date_calendar(graph)))
         print("\n The floats are: {}".format(compute_floats(graph)))
         print("\n The critical paths are: {}".format(compute_critical_paths(graph)))
@@ -279,10 +278,14 @@ def compute_floats(graph):
 def compute_critical_paths(graph):
     '''compute_critical_paths function takes as a parameter a graph and returns a list of critical paths'''
     floats = compute_floats(graph)
+    ranks = compute_ranks(graph)
     critical_paths = []
     visited = {vertex: False for vertex in graph}
     successors = get_successors(graph)
-
+    ordered_vertices = sorted(graph, key=lambda vertex: ranks[vertex])  # Order the vertices by their ranks
+    ordered_vertices_dico = {vertex: graph[vertex] for vertex in ordered_vertices}
+    print(ordered_vertices_dico)
+    #print(ordered_vertices)
     def visit(vertex, path):
         if not visited[vertex]:
             visited[vertex] = True
@@ -291,14 +294,13 @@ def compute_critical_paths(graph):
                 critical_paths.append(path.copy())
             for successor in successors[vertex]:
                 if floats[successor] == 0:
-                    visit(successor, path)
+                    visit(successor, path.copy())
             path.pop()
 
-    for vertex in graph:
-        visit(0, [])
+    for vertex in ordered_vertices_dico:  # Visit the vertices in the order of their ranks
+        visit(vertex, [])
 
     return critical_paths
-
 '''
 def main():
     while True:
@@ -324,7 +326,7 @@ def main():
                 print("\n❀ The graph contains zero edges.")
             if is_scheduling_graph(graph):
                 print("\n❀ The graph is a scheduling graph.")
-                print("\n❀ The ranks of the vertices are: {}".format(compute_rank(graph)))  
+                print("\n❀ The ranks of the vertices are: {}".format(compute_ranks(graph)))  
                 if not all(vertex['duration'] != 0 for vertex in graph.values()):
                     print("\n❀ Earliest date calendar: {}".format(compute_earliest_date_calendar(graph)))
                     print("\n❀ Latest date calendar: {}".format(compute_latest_date_calendar(graph)))
