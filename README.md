@@ -7,5 +7,5 @@ This project is an exploration of graph theory concepts using Python. It include
 python3 main.py
 
 ### About
-Created By  : Audrey DAMIBA, Melissa LACHEB, Timéo GOGOLACHVILI , Thomas MASSELLES, Zoé LE MAIGUET
+Created By  : Audrey DAMIBA, Melissa LACHEB, Timéo GOGOLACHVILI , Thomas MASSELLES, Zoé LE MAIGAT
 Creation Date: 2024-03-29
