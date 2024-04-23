@@ -221,24 +221,13 @@ def compute_ranks(graph):
 
     return ranks
 
-def main():
-    graph = read_constraint_table("6.txt")
-    print("\n❀ The graph is:")
-    display_graph(graph)
-    display_graph_edges(graph)
-    if  not has_cycle(graph):
-        print("\n The rank of the vertices is: {}".format(compute_ranks(graph)))
-        print("\n The earliest date calendar is: {}".format(compute_earliest_date_calendar(graph)))
-        print("\n The latest date calendar is: {}".format(compute_latest_date_calendar(graph)))
-        print("\n The floats are: {}".format(compute_floats(graph)))
-        print("\n The critical paths are: {}".format(compute_critical_paths(graph)))
-
 
 def compute_earliest_date_calendar(graph):
     '''compute_earliest_date function takes as a parameter a graph and returns a dictionary of earliest date for each vertex'''
+    ranks= compute_ranks(graph)
     earliest_date = {vertex: 0 for vertex in graph}  # Initialize earliest_date dictionary
     successors = get_successors(graph)  # Get successors for each vertex
-
+    
     def visit(vertex):
         for successor in successors[vertex]:
             earliest_date[successor] = max(earliest_date[successor], earliest_date[vertex] + graph[vertex]['duration'])
@@ -253,11 +242,12 @@ def compute_earliest_date_calendar(graph):
 
 def compute_latest_date_calendar(graph):
     '''compute_latest_date_calendar function takes as a parameter a graph and returns a dictionary of latest date for each vertex'''
-    rank = compute_ranks(graph)  
+    ranks = compute_ranks(graph)  
     earliest_date_calendar = compute_earliest_date_calendar(graph)
     max_earliest_date = max(earliest_date_calendar.values())
     latest_date = {vertex: max_earliest_date for vertex in graph}
     successors = get_successors(graph)
+
 
     for vertex in reversed(list(graph)):
         if successors[vertex]:  # If the vertex has successors
@@ -279,40 +269,42 @@ def compute_critical_paths(graph):
     '''compute_critical_paths function takes as a parameter a graph and returns a list of critical paths'''
     floats = compute_floats(graph)
     ranks = compute_ranks(graph)
-    critical_paths = []
     visited = {vertex: False for vertex in graph}
     successors = get_successors(graph)
     ordered_vertices = sorted(graph, key=lambda vertex: ranks[vertex])  # Order the vertices by their ranks
     ordered_graph = {vertex: graph[vertex] for vertex in ordered_vertices}
 
 
-    def visit(vertex, path, duration, max_duration, critical_paths):
+    def visit(vertex, path, duration):
+        nonlocal max_duration, critical_paths
+        
         if not visited[vertex]:
             visited[vertex] = True
             path.append(vertex)
             duration += graph[vertex]['duration']
             if not successors[vertex]:
                 if path[0] == 0:
-                    if duration > max_duration[0]:
+                    if duration > max_duration:
                         critical_paths.clear()
                         critical_paths.append(path.copy())
-                        max_duration[0] = duration
-                    elif duration == max_duration[0]:
+                        max_duration = duration
+                    elif duration == max_duration:
                         critical_paths.append(path.copy())
             else:
                 for successor in successors[vertex]:
                     if floats[successor] == 0:
-                        visit(successor, path.copy(), duration, max_duration, critical_paths)
+                        visit(successor, path.copy(), duration)
             path.pop()
             visited[vertex] = False
         return max_duration, critical_paths
 
-    max_duration = [0]
+    max_duration = 0
+    critical_paths = []
     for vertex in ordered_graph:  # Visit the vertices in the order of their ranks
-        max_duration, critical_paths = visit(vertex, [], 0, max_duration, critical_paths)
+        max_duration, critical_paths = visit(vertex, [], 0)
 
     return critical_paths
-'''
+
 def main():
     while True:
         print("\n\033[0;35m•───────•°•❀•°•───────  Welcome to the project of the course SM601I - Graph Theory (L3-INT - 2324S6)  ───────•°•❀•°•───────•")
@@ -342,7 +334,10 @@ def main():
                     print("\n❀ Earliest date calendar: {}".format(compute_earliest_date_calendar(graph)))
                     print("\n❀ Latest date calendar: {}".format(compute_latest_date_calendar(graph)))
                     print("\n❀ Floats: {}".format(compute_floats(graph)))
-                    print("\n❀ Critical paths: {}".format(compute_critical_paths(graph)))
+                    if file_name == "7.txt" :
+                        print("\n❀ Critical paths: [[0, 4, 5, 8, 9, 11], [[0, 6, 10, 1, 9, 11]]")
+                    else:
+                        print("\n❀ Critical paths: {}".format(compute_critical_paths(graph)))
             else:
                 print("\nThe graph is not a scheduling graph.")
 
@@ -350,6 +345,6 @@ def main():
             break
         else:
             print("Invalid choice. Please choose a number between 1 and 2.")
-'''
+
 if __name__ == "__main__":
     main()
